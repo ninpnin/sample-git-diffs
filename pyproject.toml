@@ -1,10 +1,12 @@
 [tool.poetry]
 name = "sample-git-diffs"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["ninpnin <you@example.com>"]
 packages = [{include = "sample_git_diffs"}]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/ninpnin/sample-git-diffs"
 
 [tool.poetry.dependencies]
 python = "^3.8"
