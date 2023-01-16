@@ -17,8 +17,8 @@ def sample_from_diff(s, n=1, filename=""):
     intro = []
     diffs = []
     for l in lines:
-        patterns = DIFF_EXP.search(l)
-        if patterns is not None:
+        # Check '@' first for performance reasons
+        if "@" in l and DIFF_EXP.search(l) is not None:
             diffs.append(l)
         elif len(diffs) >= 1:
             diffs[-1] += f"\n{l}"
@@ -35,6 +35,7 @@ def sample_from_diff(s, n=1, filename=""):
     return f"{intro}\n{diff}"
 
 def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
+    diffstat = diffstat.replace("--stat", "--stat=1000")
     call = list(diffstat.split())
     result = subprocess.run(call, capture_output=True)
     csv_data = result.stdout.decode("utf-8")
