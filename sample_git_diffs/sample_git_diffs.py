@@ -41,6 +41,7 @@ def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
     df = pd.read_csv(StringIO(csv_data), delimiter="|", names=["filename", "changes"])
     df["changes"] = df["changes"].str.strip().str.split(" ").str[0]
     df = df[df["changes"].notnull()]
+    df = df[~df["changes"].str.contains("Bin")]
     df["changes"] = df["changes"].astype(int)
     df["p"] = df["changes"] / df["changes"].sum()
     
