@@ -34,6 +34,31 @@ def sample_from_diff(s, n=1):
     diff = "\n".join(diff_sample)
     return f"{intro}\n{diff}"
 
+def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
+    call = list(diffstat.split())
+    result = subprocess.run(call, capture_output=True)
+    csv_data = result.stdout.decode("utf-8")
+    df = pd.read_csv(StringIO(csv_data), delimiter="|", names=["filename", "changes"])
+    df["changes"] = df["changes"].str.strip().str.split(" ").str[0]
+    df = df[df["changes"].notnull()]
+    df["changes"] = df["changes"].astype(int)
+    df["p"] = df["changes"] / df["changes"].sum()
+    
+    sample = df.sample(n, weights="p", replace=True)
+    sample = sample.groupby(['filename'], as_index=False).size()
+
+    output = ""
+    for _, row in sample.iterrows():
+        filename, n_row = row["filename"], row["size"]
+        call = list(diffcommand.split())+ [filename.strip()]
+        result = subprocess.run(call, capture_output=True)
+        s = result.stdout.decode("utf-8")
+
+        diff = sample_from_diff(s, n=n_row)
+        output += f"{diff}\n"
+        
+    return output
+
 def cli():
     argparser = argparse.ArgumentParser(description=__doc__)
     argparser.add_argument("--n", type=int, default=150, help="Total number of diffs to be sampled")
@@ -43,25 +68,7 @@ def cli():
         help="Custom git diff command for the actual diff")
     args = argparser.parse_args()
 
-    call = list(args.diffstat.split())
-    result = subprocess.run(call, capture_output=True)
-    csv_data = result.stdout.decode("utf-8")
-    df = pd.read_csv(StringIO(csv_data), delimiter="|", names=["filename", "changes"])
-    df["changes"] = df["changes"].str.strip().str.split(" ").str[0]
-    df = df[df["changes"].notnull()]
-    df["changes"] = df["changes"].astype(int)
-    df["p"] = df["changes"] / df["changes"].sum()
-    
-    sample = df.sample(args.n, weights="p", replace=True)
-    sample = sample.groupby(['filename'], as_index=False).size()
-
-    for _, row in sample.iterrows():
-        filename, n = row["filename"], row["size"]
-        call = list(args.diffcommand.split())+ [filename.strip()]
-        result = subprocess.run(call, capture_output=True)
-        s = result.stdout.decode("utf-8")
-
-        diff = sample_from_diff(s, n=n)
-        print(diff)
+    output = sample_diffs(**vars(args))
+    print(output)
 
     
