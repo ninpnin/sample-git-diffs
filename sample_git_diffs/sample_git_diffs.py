@@ -27,7 +27,7 @@ def sample_from_diff(s, n=1):
 
     intro = "\n".join(intro)
     if n > len(diffs):
-        warnings.warn(f"n ({n}) is larger than the sampled number of diffs", stacklevel=2)
+        warnings.warn(f"n ({n}) is larger than the number of diffs in the file ({len(diffs)})", stacklevel=2)
         diff_sample = diffs
     else:
         diff_sample = random.sample(diffs, n)
@@ -44,10 +44,13 @@ def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
     df["changes"] = df["changes"].astype(int)
     df["p"] = df["changes"] / df["changes"].sum()
     
+    if len(df) == 0:
+        warnings.warn(f"No diffs detected", stacklevel=2)
+        return ""
     sample = df.sample(n, weights="p", replace=True)
     sample = sample.groupby(['filename'], as_index=False).size()
 
-    output = ""
+    output = []
     for _, row in sample.iterrows():
         filename, n_row = row["filename"], row["size"]
         call = list(diffcommand.split())+ [filename.strip()]
@@ -55,9 +58,9 @@ def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
         s = result.stdout.decode("utf-8")
 
         diff = sample_from_diff(s, n=n_row)
-        output += f"{diff}\n"
+        output.append(diff)
         
-    return output
+    return "\n".join(output)
 
 def cli():
     argparser = argparse.ArgumentParser(description=__doc__)
