@@ -12,7 +12,7 @@ import argparse
 
 DIFF_EXP = re.compile("@@[ 0-9\.,\-\+]{2,50}@@")
 
-def sample_from_diff(s, n=1):
+def sample_from_diff(s, n=1, filename=""):
     lines = s.split("\n")
     intro = []
     diffs = []
@@ -27,7 +27,7 @@ def sample_from_diff(s, n=1):
 
     intro = "\n".join(intro)
     if n > len(diffs):
-        warnings.warn(f"n ({n}) is larger than the number of diffs in the file ({len(diffs)})", stacklevel=2)
+        warnings.warn(f"n ({n}) is larger than the number of diffs in the file ({len(diffs)}) {filename}", stacklevel=2)
         diff_sample = diffs
     else:
         diff_sample = random.sample(diffs, n)
@@ -58,7 +58,7 @@ def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
         result = subprocess.run(call, capture_output=True)
         s = result.stdout.decode("utf-8")
 
-        diff = sample_from_diff(s, n=n_row)
+        diff = sample_from_diff(s, n=n_row, filename=filename.strip())
         output.append(diff)
         
     return "\n".join(output)
