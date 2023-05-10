@@ -54,7 +54,7 @@ def main(args):
         print("- [ ] Incorrect")
         print()
 
-if __name__ == '__main__':
+def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", required=True)
     parser.add_argument("--username", default="welfare-state-analytics")
