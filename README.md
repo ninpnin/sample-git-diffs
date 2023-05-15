@@ -23,6 +23,8 @@ To save this to changes.diff, you run
 sample-git-diffs --diffstat "git diff --stat data/" --n 25 > changes.diff
 ```
 
+## diff2markdown
+
 There's also a script that converts the generated .diff / .patch files into markdown.
 
 ```
