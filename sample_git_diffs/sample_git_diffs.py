@@ -9,6 +9,7 @@ import random
 import warnings
 from io import StringIO
 import argparse
+from pathlib import Path
 
 DIFF_EXP = re.compile("@@[ 0-9\.,\-\+]{2,50}@@")
 
@@ -53,9 +54,10 @@ def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
     sample = sample.groupby(['filename'], as_index=False).size()
 
     output = []
+    diffcommand_prime = list(filter(lambda fp: not Path(fp).exists(), diffcommand.split()))
     for _, row in sample.iterrows():
         filename, n_row = row["filename"], row["size"]
-        call = list(diffcommand.split())+ [filename.strip()]
+        call = diffcommand_prime + [filename.strip()]
         result = subprocess.run(call, capture_output=True)
         s = result.stdout.decode("utf-8")
 
@@ -72,10 +74,12 @@ def cli():
     argparser.add_argument("--diffcommand", type=str, default=None,
         help="Custom git diff command for the actual diff")
     args = argparser.parse_args()
-    if args.diffcommand is None:
-        args.diffcommand = args.diffstat.replace("--stat", "")
+    diffstat, diffcommand = args.diffstat, args.diffcommand
+    n = args.n
+    if diffcommand is None:
+        diffcommand = diffstat.replace("--stat", "")
 
-    output = sample_diffs(**vars(args))
+    output = sample_diffs(diffstat=diffstat, diffcommand=diffcommand, n=n)
     print(output)
 
     
