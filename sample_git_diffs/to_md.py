@@ -50,8 +50,9 @@ def main(args):
 
         print("```")
         print()
-        print("- [ ] Correct")
-        print("- [ ] Incorrect")
+        print("- [ ] Incorrect --> Correct")
+        print("- [ ] Correct --> Incorrect")
+        print("- [ ] Incorrect --> Incorrect")
         print()
 
 def cli():
