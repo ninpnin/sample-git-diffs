@@ -68,7 +68,7 @@ def sample_diffs(diffstat="git diff --stat", diffcommand="git diff", n=150):
 
 def cli():
     argparser = argparse.ArgumentParser(description=__doc__)
-    argparser.add_argument("--n", type=int, default=150, help="Total number of diffs to be sampled")
+    argparser.add_argument("-n", "--n", type=int, default=150, help="Total number of diffs to be sampled")
     argparser.add_argument("--diffstat", type=str, default="git diff --stat",
         help="Custom git diff command for the sampling probabilities")
     argparser.add_argument("--diffcommand", type=str, default=None,
