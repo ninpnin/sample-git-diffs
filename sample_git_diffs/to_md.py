@@ -50,15 +50,18 @@ def main(args):
 
         print("```")
         print()
-        print("- [ ] Correct")
-        print("- [ ] Incorrect")
+        print("- [ ] Incorrect --> Correct")
+        print("- [ ] Correct --> Incorrect")
+        if args.eval_options == 3:
+            print("- [ ] Incorrect --> Incorrect")
         print()
 
 def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", required=True)
-    parser.add_argument("--username", default="welfare-state-analytics")
-    parser.add_argument("--reponame", default="riksdagen-corpus")
+    parser.add_argument("--username", default="swerik-project")
+    parser.add_argument("--reponame", default="riksdagen-records")
     parser.add_argument("--branch", default="dev")
+    parser.add_argument("--eval-options", type=int, choices=[2,3], default=3)
     args = parser.parse_args()
     main(args)
