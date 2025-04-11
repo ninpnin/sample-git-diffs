@@ -62,6 +62,7 @@ def cli():
     parser.add_argument("--username", default="swerik-project")
     parser.add_argument("--reponame", default="riksdagen-records")
     parser.add_argument("--branch", default="dev")
-    parser.add_argument("--eval-options", type=int, choices=[2,3], default=3)
+    parser.add_argument("--eval-options", type=int, choices=[2,3],
+                        default=3, help="3 contains an option for Incorrect --> Incorrect; 2 does not")
     args = parser.parse_args()
     main(args)
